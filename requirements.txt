@@ -9,3 +9,4 @@ streamlit_extras
 requests
 bs4
 retry
+sentence_transformers
