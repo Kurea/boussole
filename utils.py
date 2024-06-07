@@ -1,26 +1,55 @@
+import os
+from retry import retry
+import streamlit as st
+import json
+from langchain.prompts import ChatPromptTemplate
+
+def get_llm_config(**kwargs):
+    if (st.secrets['AZURE_MODE']):
+        from langchain_openai import AzureOpenAI, AzureChatOpenAI, AzureOpenAIEmbeddings
+        os.environ['OPENAI_API_KEY'] = st.secrets["AZURE_OPENAI_API_KEY"]
+        os.environ['AZURE_OPENAI_API_KEY'] = st.secrets["AZURE_OPENAI_API_KEY"]
+        os.environ['OPENAI_API_VERSION'] = "2023-03-15-preview"
+        os.environ['AZURE_OPENAI_ENDPOINT'] = st.secrets["AZURE_OPENAI_ENDPOINT"]
+        return (AzureOpenAI(azure_deployment=st.secrets["AZURE_OPENAI_DEPLOYMENT_CHAT"], **kwargs), 
+                AzureChatOpenAI(azure_deployment=st.secrets["AZURE_OPENAI_DEPLOYMENT_CHAT"], **kwargs), 
+                AzureOpenAIEmbeddings(deployment=st.secrets["AZURE_OPENAI_DEPLOYMENT_EMB"]))
+    else:
+        from langchain_openai import OpenAI, ChatOpenAI, OpenAIEmbeddings
+        os.environ['OPENAI_API_KEY'] = st.secrets["OPENAI_KEY"]
+        return (OpenAI(**kwargs), ChatOpenAI(**kwargs), OpenAIEmbeddings()) 
+    
+def _get_session():
+    from streamlit.runtime import get_instance
+    from streamlit.runtime.scriptrunner import get_script_run_ctx
+    runtime = get_instance()
+    session_id = get_script_run_ctx().session_id
+    session_info = runtime._session_mgr.get_session_info(session_id)
+    if session_info is None:
+        raise RuntimeError("Couldn't get your Streamlit Session object.")
+    return session_id
+
 # GPT-4 or GPT-3.5 Prompt to complete
 @retry(tries=2, delay=5)
 def process_gpt(system,
                 prompt):
 
-    completion = openai.ChatCompletion.create(
-        # engine="gpt-3.5-turbo",
-        model="gpt-3.5-turbo",
+    _, completion, _ = get_llm_config(
         max_tokens=2400,
         # Try to be as deterministic as possible
         temperature=0,
-        messages=[
+    )
+    completion(messages=[
             {"role": "system", "content": system},
             {"role": "user", "content": prompt},
-        ]
-    )
+        ])
     nlp_results = completion.choices[0].message.content
     return nlp_results
 
 def run_completion(prompt, results, ctext):
     try:
       system = "Vous êtes un expert Accident aidant qui extrait des informations pertinentes et les stocke dans un graphe de connaissances Neo4j"
-      pr = Template(prompt).substitute(ctext=ctext)
+      pr = ChatPromptTemplate(prompt).substitute(ctext=ctext)
       res = process_gpt(system, pr)
       results.append(json.loads(res.replace("\'", "'")))
       return results

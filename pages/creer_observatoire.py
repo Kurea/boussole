@@ -1,5 +1,5 @@
 import streamlit as st
-import neo4j
+#import neo4j
 import requests
 from bs4 import BeautifulSoup
 from neo4j import GraphDatabase

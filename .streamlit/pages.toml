@@ -12,3 +12,8 @@ icon = ":books:"
 path = "pages/nouvel_observatoire.py"
 name = "Nouvel Observatoire"
 icon = ":bar_chart:"
+
+[[pages]]
+path = "pages/chat.py"
+name = "Chatter"
+icon = ":robot_face:"

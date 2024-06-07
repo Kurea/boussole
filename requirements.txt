@@ -1,13 +1,9 @@
-altair
-pandas
 streamlit
 neo4j
 googlesearch-python
 langchain
 langchain_community
-openai
-tiktoken
-cohere
+langchain_openai
 st_pages
 streamlit_extras
 requests

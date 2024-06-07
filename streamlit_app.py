@@ -1,25 +1,24 @@
-import altair as alt
+#import altair as alt
 import numpy as np
-import pandas as pd
+#import pandas as pd
 import streamlit as st
-import neo4j as neo4j
-import googlesearch as googlesearch
+#import neo4j as neo4j
+#import googlesearch as googlesearch
 import langchain
 import langchain_community
 import os
 import st_pages
 import streamlit_extras
+from st_pages import show_pages_from_config
+from utils import get_llm_config
+
 
 st.set_page_config(
-        page_title="Observatoire des Accidents",
+        page_title="La boussole",
 )
 
 #from streamlit_extras.app_logo import add_logo
 #add_logo("images/icon_accidents.png", height=10)
-
-
-
-from st_pages import show_pages_from_config
 
 show_pages_from_config()
 
@@ -31,14 +30,12 @@ show_pages_from_config()
 
 # openai_api_key = st.secrets["OPENAI_KEY"]
 
-from langchain_community.llms import OpenAI
 from langchain_community.graphs import Neo4jGraph
 from langchain.chains import RetrievalQA
-from langchain_community.chat_models import ChatOpenAI
-from langchain.vectorstores.neo4j_vector import Neo4jVector
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_community.vectorstores import Neo4jVector
 
-os.environ['OPENAI_API_KEY'] = st.secrets["OPENAI_KEY"]
+
+llm, chatmodel, embeddings = get_llm_config()
 url = st.secrets["AAA_URI"]
 username = st.secrets["AAA_USERNAME"]
 password = st.secrets["AAA_PASSWORD"]
@@ -48,11 +45,8 @@ graph = Neo4jGraph(
     password=password
 )
 
-
-llm = OpenAI()
-
 vectorstore = Neo4jVector.from_existing_graph(
-    OpenAIEmbeddings(),
+    embeddings,
     url=url,
     username=username,
     password=password,
@@ -63,7 +57,7 @@ vectorstore = Neo4jVector.from_existing_graph(
 )
 
 vector_qa = RetrievalQA.from_chain_type(
-    llm=ChatOpenAI(), chain_type="stuff", retriever=vectorstore.as_retriever())
+    llm=chatmodel, chain_type="stuff", retriever=vectorstore.as_retriever())
 
 contextualize_query = """
 match (node)-[:DOCUMENTE]->(e:Evenement)
@@ -82,7 +76,7 @@ RETURN "Titre Article: "+ a.titre + " description: "+ a.description + " facteur:
 """
 
 contextualized_vectorstore = Neo4jVector.from_existing_index(
-    OpenAIEmbeddings(),
+    embeddings,
     url=url,
     username=username,
     password=password,
@@ -91,7 +85,7 @@ contextualized_vectorstore = Neo4jVector.from_existing_index(
 )
 
 vector_plus_context_qa = RetrievalQA.from_chain_type(
-    llm=ChatOpenAI(), chain_type="stuff", retriever=contextualized_vectorstore.as_retriever())
+    llm=chatmodel, chain_type="stuff", retriever=contextualized_vectorstore.as_retriever())
 
 # Streamlit layout with tabs
 container = st.container()
