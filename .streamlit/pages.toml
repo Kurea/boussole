@@ -1,5 +1,10 @@
 [[pages]]
 path = "streamlit_app.py"
+name = "Score d'immunité"
+icon = ":house:"
+
+[[pages]]
+path = "pages/observatoire.py"
 name = "Interroger Observatoire"
 icon = ":house:"
 
