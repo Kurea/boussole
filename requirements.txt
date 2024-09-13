@@ -1,12 +1,8 @@
 streamlit
 neo4j
-googlesearch-python
 langchain
 langchain_community
 langchain_openai
-st_pages
-streamlit_extras
 requests
 bs4
 retry
-sentence_transformers

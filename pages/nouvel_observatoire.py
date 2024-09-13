@@ -19,10 +19,6 @@ st.set_page_config(
         page_title="Nouvel Observatoire",
 )
 
-from st_pages import show_pages_from_config
-
-show_pages_from_config()
-
 st.title("🆕 Nouvel observatoire sur les accidents")
 
 constraints_cyp="""

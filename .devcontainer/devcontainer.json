@@ -8,7 +8,7 @@
     "codespaces": {
       "openFiles": [
         "README.md",
-        "Score_d_immunite.py"
+        "🏠_Accueil.py"
       ]
     },
     "vscode": {
@@ -21,7 +21,7 @@
   },
   "updateContentCommand": "[ -f packages.txt ] && sudo apt update && sudo apt upgrade && sudo xargs apt install -y <packages.txt; pip3 install --user -r requirements.txt",
   "postAttachCommand": {
-    "server": "streamlit run Score_d_immunite.py --server.enableCORS false --server.enableXsrfProtection false"
+    "server": "streamlit run 🏠_Accueil.py --server.enableCORS false --server.enableXsrfProtection false"
   },
   "portsAttributes": {
     "8501": {

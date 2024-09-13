@@ -7,9 +7,6 @@ import streamlit as st
 import langchain
 import langchain_community
 import os
-import st_pages
-import streamlit_extras
-from st_pages import show_pages_from_config
 from utils import get_llm_config
 
 
@@ -17,10 +14,7 @@ st.set_page_config(
         page_title="La boussole",
 )
 
-#from streamlit_extras.app_logo import add_logo
 #add_logo("images/icon_accidents.png", height=10)
-
-show_pages_from_config()
 
 """
 # Observatoire des accidents
